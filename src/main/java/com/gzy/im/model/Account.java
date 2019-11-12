@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -16,6 +19,7 @@ import java.time.LocalDate;
                 @UniqueConstraint(columnNames = {"phone"})
         }
 )
+@EntityListeners(AuditingEntityListener.class)
 public class Account {
 
     @Id
@@ -37,5 +41,8 @@ public class Account {
     // 优化  int  4 * byte  50
     private Integer gender;
 //            性别
+
+    @CreatedDate
+    private LocalDateTime createdDate;
 
 }
