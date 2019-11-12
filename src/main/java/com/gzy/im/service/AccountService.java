@@ -12,7 +12,6 @@ public class AccountService {
 
     @Resource
     AccountRepository accountRepository;
-
     public Account getAccount(Long uid) {
         Optional<Account> byId = accountRepository.findById(uid);
         // 如果为空  应该直接返回 404
