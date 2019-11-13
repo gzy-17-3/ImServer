@@ -1,12 +1,13 @@
 package com.gzy.im.controller;
 
 import com.gzy.im.core.exception.NotFoundException;
+import com.gzy.im.core.security.AppUserDetails;
 import com.gzy.im.model.Account;
 import com.gzy.im.model.Token;
 import com.gzy.im.service.AuthService;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -42,6 +43,14 @@ public class AuthController {
         return loginV;
     }
 
+    @PostMapping("/update_password")
+    public void updatePassword(@AuthenticationPrincipal AppUserDetails appUserDetails,
+                               @Valid @RequestBody UpdatePwd updatePwd
+    ){
+        service.updatePWD(appUserDetails.account.getId(),updatePwd.getOldPassword(),updatePwd.getNewPassword());
+    }
+
+
 }
 
 @Getter
@@ -51,4 +60,12 @@ class SigninPara {
     String phone;
     @NotBlank(message = "密码不能为空")
     String password;
+}
+@Getter
+@Setter
+class UpdatePwd{
+    @NotBlank()
+    String oldPassword;
+    @NotBlank()
+    String newPassword;
 }

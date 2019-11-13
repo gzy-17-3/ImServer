@@ -6,6 +6,8 @@ import com.gzy.im.model.Account;
 import com.gzy.im.repository.AccountRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.annotation.Resource;
@@ -32,8 +34,9 @@ public class AccountService {
         if (byId.isEmpty()){
             throw new NotFoundException();
         }
-
         Account account1 = byId.get();
+
+        accountPara.setPassword(null);
 
         AppBeanUtils.copyNotNullProperties(accountPara,account1);
 

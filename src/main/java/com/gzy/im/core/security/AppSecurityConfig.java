@@ -1,14 +1,14 @@
-package com.gzy.im.core;
+package com.gzy.im.core.security;
 
 
-import com.gzy.im.service.AppUserDetailsService;
+import com.gzy.im.core.security.AppUserDetailsService;
+import com.gzy.im.core.security.TokenAuthenticationFilter;
 import com.gzy.im.service.TokenService;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import javax.annotation.Resource;
 
