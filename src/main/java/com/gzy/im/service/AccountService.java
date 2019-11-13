@@ -1,7 +1,9 @@
 package com.gzy.im.service;
 
+import com.gzy.im.core.AppBeanUtils;
 import com.gzy.im.model.Account;
 import com.gzy.im.repository.AccountRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -18,4 +20,18 @@ public class AccountService {
 
         return byId.get();
     }
+
+    public Account updateAccount(Long uid, Account accountPara) {
+        Optional<Account> byId = accountRepository.findById(uid);
+
+        Account account1 = byId.get();
+
+        AppBeanUtils.copyNotNullProperties(accountPara,account1);
+
+        accountRepository.save(account1);
+
+        return account1;
+    }
+
+
 }

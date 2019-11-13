@@ -6,10 +6,7 @@ import com.gzy.im.service.AppUserDetailsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -33,10 +30,21 @@ public class MineController {
     }
 
 //    修改信息
-//    修改头像
+    @PutMapping("/{uid}")
+    Object updateAccount(@PathVariable Long uid,
+                         @AuthenticationPrincipal AppUserDetailsService.AppUserDetails appUserDetails,
+                         @RequestBody Account account
+    ){
+        if (!uid.equals(appUserDetails.account.getId())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return accountService.updateAccount(uid,account);
+    }
+
 //    修改密码
 
 
-
+//    修改头像
 //    上传头像
 }
