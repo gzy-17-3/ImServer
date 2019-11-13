@@ -28,7 +28,6 @@ public class AccountService {
 
     public Account updateAccount(Long uid, Account accountPara) {
         Optional<Account> byId = accountRepository.findById(uid);
-        
         if (byId.isEmpty()){
             throw new NotFoundException();
         }
