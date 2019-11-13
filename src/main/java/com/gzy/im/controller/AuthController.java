@@ -1,5 +1,6 @@
 package com.gzy.im.controller;
 
+import com.gzy.im.core.exception.NotFoundException;
 import com.gzy.im.model.Account;
 import com.gzy.im.model.Token;
 import com.gzy.im.service.AuthService;
@@ -23,7 +24,7 @@ public class AuthController {
     //    注册
 //    signin
     @PostMapping("/signin")
-    public Object signin(@Valid @RequestBody SigninPara para ){
+    public Account signin(@Valid @RequestBody SigninPara para ){
         // 注册的事情
         return service.signin(para.getPhone(),para.getPassword());
     }
@@ -31,11 +32,11 @@ public class AuthController {
     //    登陆
 
     @PostMapping("/login")
-    public Object login(@Valid @RequestBody SigninPara para ){
+    public Token login(@Valid @RequestBody SigninPara para ){
         Token loginV = service.login(para.getPhone(), para.getPassword());
 
         if (loginV == null){
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException();
         }
 
         return loginV;
