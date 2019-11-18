@@ -1,6 +1,7 @@
 package com.gzy.im.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,31 @@ import java.util.stream.Stream;
 @Service
 public class FileSystemStorageService {
 
-    private Path rootLocation = Paths.get("/Users/lxf/Documents/upload22222");
+    @Value("${com.gzy.im.service.FileSystemStorageService.rootLocationStr}")
+    String rootLocationStr;
+    // property
+    // 单文件 替换  ctrl + r replace
+    // 单文件查找  ctrl + f  find
+    public Path getRootLocation() {
+        if (rootLocation == null){
+            init();
+        }
+        return rootLocation;
+    }
+
+    public void setRootLocation(Path rootLocation) {
+        this.rootLocation = rootLocation;
+    }
+
+    private Path rootLocation;
+
 
     public FileSystemStorageService() {
-        init();
+//        rootLocation = Paths.get(rootLocationStr);
+
+        // 懒加载  lazy load
+
+//        init();
     }
 
     public void store(String filename,MultipartFile file) {
@@ -41,7 +63,7 @@ public class FileSystemStorageService {
                                 + filename);
             }
             try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, this.rootLocation.resolve(filename),
+                Files.copy(inputStream, this.getRootLocation().resolve(filename),
                         StandardCopyOption.REPLACE_EXISTING);
             }
         }
@@ -63,7 +85,7 @@ public class FileSystemStorageService {
                                 + filename);
             }
             try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, this.rootLocation.resolve(filename),
+                Files.copy(inputStream, this.getRootLocation().resolve(filename),
                         StandardCopyOption.REPLACE_EXISTING);
             }
         }
@@ -72,12 +94,11 @@ public class FileSystemStorageService {
         }
     }
 
-
     public Stream<Path> loadAll() {
         try {
-            return Files.walk(this.rootLocation, 1)
-                    .filter(path -> !path.equals(this.rootLocation))
-                    .map(this.rootLocation::relativize);
+            return Files.walk(this.getRootLocation(), 1)
+                    .filter(path -> !path.equals(this.getRootLocation()))
+                    .map(this.getRootLocation()::relativize);
         }
         catch (IOException e) {
             throw new RuntimeException("Failed to read stored files", e);
@@ -86,7 +107,7 @@ public class FileSystemStorageService {
     }
 
     public Path load(String filename) {
-        return rootLocation.resolve(filename);
+        return getRootLocation().resolve(filename);
     }
 
     public Resource loadAsResource(String filename) {
@@ -108,11 +129,12 @@ public class FileSystemStorageService {
     }
 
     public void deleteAll() {
-        FileSystemUtils.deleteRecursively(rootLocation.toFile());
+        FileSystemUtils.deleteRecursively(getRootLocation().toFile());
     }
 
     public void init() {
         try {
+            rootLocation = Paths.get(rootLocationStr);
             Files.createDirectories(rootLocation);
         }
         catch (IOException e) {
