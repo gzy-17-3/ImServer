@@ -25,9 +25,10 @@ public class AuthController {
     //    注册
 //    signin
     @PostMapping("/signin")
-    public Account signin(@Valid @RequestBody SigninPara para ){
+    public Token signin(@Valid @RequestBody SigninPara para ){
         // 注册的事情
-        return service.signin(para.getPhone(),para.getPassword());
+        Account signin = service.signin(para.getPhone(), para.getPassword());
+        return service.login(para.getPhone(), para.getPassword());
     }
 
     //    登陆
