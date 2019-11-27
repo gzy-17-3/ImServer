@@ -33,15 +33,10 @@ public class AddFriendRequestController {
 
     //    获取申请添加为好友列表
     // 获取 所有 未处理 申请添加好友数据
-    @GetMapping("/{uid}")
-    List<AddFriendRequest> index(@PathVariable Long uid, @AuthenticationPrincipal AppUserDetails appUserDetails) {
+    @GetMapping("/")
+    List<AddFriendRequest> index(@AuthenticationPrincipal AppUserDetails appUserDetails) {
         // 判断是不是当前用户
-
-        if (!uid.equals(appUserDetails.account.getId())) {
-            throw new ForbiddenException();
-        }
-
-        return addFriendRequestService.getUndisposedList(uid);
+        return addFriendRequestService.getUndisposedList(appUserDetails.account.getId());
     }
 
     //    查找用户信息 根据 用户名

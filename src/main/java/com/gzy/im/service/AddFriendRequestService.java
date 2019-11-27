@@ -22,8 +22,8 @@ public class AddFriendRequestService {
     AddFriendRequestRepository addFriendRequestRepository;
 
     public List<AddFriendRequest> getUndisposedList(Long uid) {
-
-        return null;
+        List<AddFriendRequest> list = addFriendRequestRepository.findAddFriendRequestsByToaidEquals(uid);
+        return list;
     }
 
     /**
