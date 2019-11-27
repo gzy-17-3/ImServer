@@ -5,5 +5,5 @@ import com.gzy.im.model.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FriendRelationalRepository extends JpaRepository<FriendRelational,Long> {
-
+    FriendRelational findFriendRelationalsByAidEqualsAndAidtoEquals(Long aid,Long toaid);
 }
