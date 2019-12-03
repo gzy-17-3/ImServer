@@ -6,6 +6,7 @@ import com.gzy.im.model.Account;
 import com.gzy.im.model.AddFriendRequest;
 import com.gzy.im.service.AccountService;
 import com.gzy.im.service.AddFriendRequestService;
+import com.gzy.im.service.model.AddFriendRequestFullAccount;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,7 +35,7 @@ public class AddFriendRequestController {
     //    获取申请添加为好友列表
     // 获取 所有 未处理 申请添加好友数据
     @GetMapping("/")
-    List<AddFriendRequest> index(@AuthenticationPrincipal AppUserDetails appUserDetails) {
+    List<AddFriendRequestFullAccount> index(@AuthenticationPrincipal AppUserDetails appUserDetails) {
         // 判断是不是当前用户
         return addFriendRequestService.getUndisposedList(appUserDetails.account.getId());
     }

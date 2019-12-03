@@ -2,17 +2,18 @@ package com.gzy.im.service;
 
 import com.gzy.im.core.exception.BadRequestException;
 import com.gzy.im.core.exception.ForbiddenException;
+import com.gzy.im.model.Account;
 import com.gzy.im.model.AddFriendRequest;
 import com.gzy.im.model.FriendRelational;
 import com.gzy.im.repository.AccountRepository;
 import com.gzy.im.repository.AddFriendRequestRepository;
 import com.gzy.im.repository.FriendRelationalRepository;
+import com.gzy.im.service.model.AddFriendRequestFullAccount;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AddFriendRequestService {
@@ -27,10 +28,31 @@ public class AddFriendRequestService {
 
     @Resource
     FriendRelationalRepository friendRelationalRepository;
-
-    public List<AddFriendRequest> getUndisposedList(Long uid) {
+    // 未处理的 列表
+    public List<AddFriendRequestFullAccount> getUndisposedList(Long uid) {
         List<AddFriendRequest> list = addFriendRequestRepository.findAddFriendRequestsByToaidEquals(uid);
-        return list;
+        List<AddFriendRequestFullAccount> listRes = new ArrayList<>(list.size());
+        List<Long> listAid = new ArrayList<>(list.size());
+
+        for (AddFriendRequest  request: list) {
+            AddFriendRequestFullAccount fullAccount = new AddFriendRequestFullAccount();
+            BeanUtils.copyProperties(request,fullAccount);
+            listRes.add(fullAccount);
+            listAid.add(request.getAid());
+        }
+
+        // 填充 查询  account
+        List<Account> allById = accountRepository.findAllById(listAid);
+        LinkedHashMap<Long,Account> linkedHashMap = new LinkedHashMap<>();
+        for (Account account : allById) {
+            linkedHashMap.put(account.getId(),account);
+        }
+
+        for (AddFriendRequestFullAccount re : listRes) {
+            re.setAccount(linkedHashMap.get(re.getAid()));
+        }
+
+        return listRes;
     }
 
     /**
