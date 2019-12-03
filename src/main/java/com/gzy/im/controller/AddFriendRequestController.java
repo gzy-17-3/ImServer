@@ -33,7 +33,7 @@ public class AddFriendRequestController {
     AccountService accountService;
 
     //    获取申请添加为好友列表
-    // 获取 所有 未处理 申请添加好友数据
+    // 获取 所有 申请添加好友数据
     @GetMapping("/")
     List<AddFriendRequestFullAccount> index(@AuthenticationPrincipal AppUserDetails appUserDetails) {
         // 判断是不是当前用户
@@ -68,7 +68,12 @@ public class AddFriendRequestController {
         addFriendRequestService.reply(appUserDetails.account.getId(),para.requestid,para.opt);
     }
 
-
+    // 获取 所有 未处理 申请添加好友数据 的数量
+    @GetMapping("/count")
+    Long count(@AuthenticationPrincipal AppUserDetails appUserDetails) {
+        // 判断是不是当前用户
+        return addFriendRequestService.getUndisposedCount(appUserDetails.account.getId());
+    }
 }
 
 @Getter

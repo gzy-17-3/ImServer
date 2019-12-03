@@ -146,4 +146,9 @@ public class AddFriendRequestService {
         friendRelationalRepository.save(fromRelational);
         friendRelationalRepository.save(toRelational);
     }
+
+    public Long getUndisposedCount(Long id) {
+        Long aLong = addFriendRequestRepository.countAddFriendRequestByToaidEqualsAndOperation(id);
+        return aLong;
+    }
 }
