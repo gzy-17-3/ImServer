@@ -46,4 +46,9 @@ public class AccountService {
     public List<Account> findUsersByName(String name) {
         return accountRepository.findAccountsByNameLike("%"+name+"%");
     }
+
+    // 判断数据库是否存在此用户
+    public boolean existsById(Long id){
+        return accountRepository.existsById(id);
+    }
 }
