@@ -78,7 +78,11 @@ public class ChatService {
         return chatSessionDTO;
     }
 
-    // 获取 消息（会话）列表
+    /**
+     * 获取 消息（会话）列表
+     * @param meId 当前用户 id
+     * @return
+     */
     public List<ChatSessionDTO> showAllSession(Long meId) {
 
         // 查询聊天的 连接
@@ -135,9 +139,17 @@ public class ChatService {
         return resList;
     }
 
-
+    /**
+     * 发送信息（伪）
+     * @param session_id 会话id
+     * @param fromaid 发送人
+     * @param toaid 接收人
+     * @param content 发送内容
+     * @return 返回创建的对象
+     */
     public Chat sendChat(Long session_id, Long fromaid, Long toaid, String content) {
 
+        // 1. 校验是否存在 会话
         Optional<ChatSession> byId = chatSessionRepository.findById(session_id);
         if (byId.isEmpty()){
             throw new RuntimeException("找不到会话");
@@ -146,35 +158,53 @@ public class ChatService {
         Long aid1 = byId.get().getAid1();
         Long aid2 = byId.get().getAid2();
 
+        // 2. 判断  我 id  和 对方id 是否匹配
         if (!Logic.isEquality(aid1,aid2,fromaid,toaid)) {
             throw new RuntimeException("会话和 用户不匹配");
         }
 
+        // 3. 创建会话对象
         Chat chat = new Chat();
         chat.setSessionid(session_id);
         chat.setFromaid(fromaid);
         chat.setToaid(toaid);
         chat.setContent(content);
 
-        return chatRepository.save(chat);
+        Chat save = chatRepository.save(chat);
+
+        // 4. 更新会话状态 设置次 chat 为 session 的最后一个
+        byId.get().setLastChatId(save.getId());
+        chatSessionRepository.save(byId.get());
+
+        return save;
     }
 
-    public List<ChatDTO> loadInitChatData(Long id,Long sessionid,Long lastChatId) {
-
+    /**
+     * 获取 会话的聊天数据
+     * @param meid       当前用户id
+     * @param sessionid     会话 id
+     * @param lastChatId   最后的 chat id （如果为0则加载所有数据）
+     * @return
+     */
+    public List<ChatDTO> loadChatList(Long meid, Long sessionid, Long lastChatId) {
+        // 1. 校验 session
         Optional<ChatSession> session = chatSessionRepository.findById(sessionid);
         if (session.isEmpty()){
             throw new RuntimeException("找不到会话");
         }
 
-        if (!Logic.contains(id,session.get().getAid1(),session.get().getAid2())) {
+        if (!Logic.contains(meid,session.get().getAid1(),session.get().getAid2())) {
             throw new RuntimeException("不是当前用户的会话");
         }
 
-
+        // 2. 查询 聊天数据
+        // SessionidEquals   And   IdGreaterThan    OrderByIdAsc
         List<Chat> all = chatRepository.findAllBySessionidEqualsAndIdGreaterThanOrderByIdAsc(sessionid,lastChatId);
 
         List<ChatDTO> result = new ArrayList<>(all.size());
 
+
+        // 3. 查询 用户数据 数据
         Stream<Long> fromIds = all.stream().map(v -> v.getFromaid());
         Stream<Long> toIds = all.stream().map(v -> v.getToaid());
 
@@ -182,15 +212,17 @@ public class ChatService {
         List<Long> toIdsCollect = toIds.collect(Collectors.toList());
 
         fromIdsCollect.addAll(toIdsCollect);
-
+        // 3.1 此处查询
         List<Account> accountRepositoryAllById = accountRepository.findAllById(fromIdsCollect);
 
+        // 4. 构建需要返回的数据集
         for (Chat m : all) {
             ChatDTO chatDTO = new ChatDTO();
             BeanUtils.copyProperties(m,chatDTO);
 
             chatDTO.setFrom(accountRepositoryAllById.stream().filter(v -> v.getId().equals(m.getFromaid())).findFirst().get());
             chatDTO.setTo(accountRepositoryAllById.stream().filter(v -> v.getId().equals(m.getToaid())).findFirst().get());
+
             result.add(chatDTO);
         }
 

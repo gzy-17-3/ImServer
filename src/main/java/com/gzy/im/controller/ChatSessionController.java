@@ -19,12 +19,23 @@ public class ChatSessionController {
     @Resource
     ChatService chatService;
 
+    /**
+     * 创建会话
+     * @param appUserDetails
+     * @param para
+     * @return
+     */
     @PostMapping("/")
     ChatSessionDTO creat(@AuthenticationPrincipal AppUserDetails appUserDetails,@RequestBody CreateChatSessionPara para){
         ChatSessionDTO session = chatService.createSession(appUserDetails.account.getId(), para.userid);
         return session;
     }
 
+    /**
+     * 获取当前用户的会话列表
+     * @param appUserDetails
+     * @return
+     */
     @GetMapping("/")
     List<ChatSessionDTO> all(@AuthenticationPrincipal AppUserDetails appUserDetails){
         return chatService.showAllSession(appUserDetails.account.getId());
@@ -35,5 +46,6 @@ public class ChatSessionController {
 
 @Data
 class CreateChatSessionPara{
+    // 对方 uid
     Long userid;
 }

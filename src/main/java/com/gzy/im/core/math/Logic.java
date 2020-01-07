@@ -32,7 +32,7 @@ public class Logic {
     }
 
     /**
-     * 比对
+     * 比对 前两个 和 后两个 是否一致 （顺序不分前后）
      * @return
      */
     public static  <T> boolean isEquality(T i1_1, T i1_2, T i2_1, T i2_2){
