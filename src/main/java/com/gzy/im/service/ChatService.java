@@ -1,6 +1,7 @@
 package com.gzy.im.service;
 
 import com.gzy.im.core.math.Logic;
+import com.gzy.im.dto.ChatDTO;
 import com.gzy.im.dto.ChatSessionDTO;
 import com.gzy.im.model.Account;
 import com.gzy.im.model.Chat;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ChatService {
@@ -154,5 +157,43 @@ public class ChatService {
         chat.setContent(content);
 
         return chatRepository.save(chat);
+    }
+
+    public List<ChatDTO> loadInitChatData(Long id,Long sessionid) {
+
+        Optional<ChatSession> session = chatSessionRepository.findById(sessionid);
+        if (session.isEmpty()){
+            throw new RuntimeException("找不到会话");
+        }
+
+        if (!Logic.contains(id,session.get().getAid1(),session.get().getAid2())) {
+            throw new RuntimeException("不是当前用户的会话");
+        }
+
+
+        List<Chat> all = chatRepository.findAllBySessionidEqualsOrderByIdAsc(sessionid);
+
+        List<ChatDTO> result = new ArrayList<>(all.size());
+
+        Stream<Long> fromIds = all.stream().map(v -> v.getFromaid());
+        Stream<Long> toIds = all.stream().map(v -> v.getToaid());
+
+        List<Long> fromIdsCollect = fromIds.collect(Collectors.toList());
+        List<Long> toIdsCollect = toIds.collect(Collectors.toList());
+
+        fromIdsCollect.addAll(toIdsCollect);
+
+        List<Account> accountRepositoryAllById = accountRepository.findAllById(fromIdsCollect);
+
+        for (Chat m : all) {
+            ChatDTO chatDTO = new ChatDTO();
+            BeanUtils.copyProperties(m,chatDTO);
+
+            chatDTO.setFrom(accountRepositoryAllById.stream().filter(v -> v.getId().equals(m.getFromaid())).findFirst().get());
+            chatDTO.setTo(accountRepositoryAllById.stream().filter(v -> v.getId().equals(m.getToaid())).findFirst().get());
+            result.add(chatDTO);
+        }
+
+        return result;
     }
 }

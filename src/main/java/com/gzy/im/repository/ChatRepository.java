@@ -5,6 +5,10 @@ import com.gzy.im.model.Chat;
 import com.gzy.im.model.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ChatRepository extends JpaRepository<Chat,Long> {
+import java.util.List;
 
+public interface ChatRepository extends JpaRepository<Chat,Long> {
+//    List<Chat> findAllBySessionidEqualsOrderByIdDesc(Long sessionid);
+
+    List<Chat> findAllBySessionidEqualsOrderByIdAsc(Long sessionid);
 }
