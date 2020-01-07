@@ -1,8 +1,5 @@
 package com.gzy.im.service;
 
-import com.gzy.im.core.javaExtension.IEXValue;
-import com.gzy.im.core.javaExtension.IEXValueFilter;
-import com.gzy.im.core.javaExtension.ListEX;
 import com.gzy.im.core.math.Logic;
 import com.gzy.im.dto.ChatSessionDTO;
 import com.gzy.im.model.Account;
@@ -15,11 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.nio.charset.CharsetDecoder;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ChatService {
@@ -82,7 +75,7 @@ public class ChatService {
         return chatSessionDTO;
     }
 
-    // 获取 消息列表
+    // 获取 消息（会话）列表
     public List<ChatSessionDTO> showAllSession(Long meId) {
 
         // 查询聊天的 连接
@@ -140,4 +133,26 @@ public class ChatService {
     }
 
 
+    public Chat sendChat(Long session_id, Long fromaid, Long toaid, String content) {
+
+        Optional<ChatSession> byId = chatSessionRepository.findById(session_id);
+        if (byId.isEmpty()){
+            throw new RuntimeException("找不到会话");
+        }
+
+        Long aid1 = byId.get().getAid1();
+        Long aid2 = byId.get().getAid2();
+
+        if (!Logic.isEquality(aid1,aid2,fromaid,toaid)) {
+            throw new RuntimeException("会话和 用户不匹配");
+        }
+
+        Chat chat = new Chat();
+        chat.setSessionid(session_id);
+        chat.setFromaid(fromaid);
+        chat.setToaid(toaid);
+        chat.setContent(content);
+
+        return chatRepository.save(chat);
+    }
 }
