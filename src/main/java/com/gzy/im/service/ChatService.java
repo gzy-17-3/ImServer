@@ -159,7 +159,7 @@ public class ChatService {
         return chatRepository.save(chat);
     }
 
-    public List<ChatDTO> loadInitChatData(Long id,Long sessionid) {
+    public List<ChatDTO> loadInitChatData(Long id,Long sessionid,Long lastChatId) {
 
         Optional<ChatSession> session = chatSessionRepository.findById(sessionid);
         if (session.isEmpty()){
@@ -171,7 +171,7 @@ public class ChatService {
         }
 
 
-        List<Chat> all = chatRepository.findAllBySessionidEqualsOrderByIdAsc(sessionid);
+        List<Chat> all = chatRepository.findAllBySessionidEqualsAndIdGreaterThanOrderByIdAsc(sessionid,lastChatId);
 
         List<ChatDTO> result = new ArrayList<>(all.size());
 

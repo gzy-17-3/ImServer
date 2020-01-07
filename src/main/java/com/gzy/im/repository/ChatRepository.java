@@ -10,5 +10,5 @@ import java.util.List;
 public interface ChatRepository extends JpaRepository<Chat,Long> {
 //    List<Chat> findAllBySessionidEqualsOrderByIdDesc(Long sessionid);
 
-    List<Chat> findAllBySessionidEqualsOrderByIdAsc(Long sessionid);
+    List<Chat> findAllBySessionidEqualsAndIdGreaterThanOrderByIdAsc(Long sessionid,Long lastId);
 }

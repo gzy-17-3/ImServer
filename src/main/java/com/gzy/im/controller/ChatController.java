@@ -25,10 +25,9 @@ public class ChatController {
     }
 
     @GetMapping("/{session_id}")
-    List<ChatDTO> init(@AuthenticationPrincipal AppUserDetails appUserDetails,@PathVariable Long session_id){
-        return chatService.loadInitChatData(appUserDetails.account.getId(),session_id);
+    List<ChatDTO> init(@AuthenticationPrincipal AppUserDetails appUserDetails,@PathVariable Long session_id,@RequestParam(defaultValue = "0") Long lastChatId){
+        return chatService.loadInitChatData(appUserDetails.account.getId(),session_id,lastChatId);
     }
-
 
 }
 
